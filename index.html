@@ -13,6 +13,10 @@
     <script src="//cdn.jsdelivr.net/phaser/2.2.2/phaser.min.js"></script>
 </head>
 <body>
+    <audio autoplay loop>
+        <source src="assets/Sonic Sound.mp3" type="audio/mp3">
+    </audio>
+    
 
     <script type="text/javascript">
 
@@ -221,7 +225,10 @@
         eatDot: function (pacman, dot) {
 
             dot.kill();
-
+            
+            var audio = new Audio('assets/Ring Sound.mp3');          
+            audio.play()
+            
             if (this.dots.total === 0)
             {
                 this.dots.callAll('revive');
