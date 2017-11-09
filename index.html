@@ -19,7 +19,16 @@
     
 
     <script type="text/javascript">
-
+        
+    var score =0;
+    var scoreText;
+        
+    var bonus = 0;
+    var bonusText;
+    
+    var life=2;
+    var lifeText;
+        
     var game = new Phaser.Game(448, 496, Phaser.AUTO);
 
     var Pacman = function (game) {
@@ -67,6 +76,7 @@
             this.load.crossOrigin = 'anonymous';
 
             this.load.image('dot', 'assets/ring.png');
+            this.load.image('dot2', 'assets/ringBonus.png');
             this.load.image('tiles', 'assets/pacman-tiles.png');
             this.load.spritesheet('pacman', 'assets/sonic.png', 32, 32);
             this.load.tilemap('map', 'assets/pacman-map.json', null, Phaser.Tilemap.TILED_JSON);
@@ -83,12 +93,16 @@
             this.layer = this.map.createLayer('Pacman');
 
             this.dots = this.add.physicsGroup();
+            this.dots2 = this.add.physicsGroup();
 
             this.map.createFromTiles(7, this.safetile, 'dot', this.layer, this.dots);
+            this.map.createFromTiles(7, this.safetile, 'dot2', this.layer, this.dots2);
 
             //  The dots will need to be offset by 6px to put them back in the middle of the grid
             this.dots.setAll('x', 6, false, false, 1);
             this.dots.setAll('y', 6, false, false, 1);
+            this.dots2.setAll('x', 6, false, false, 1);
+            this.dots2.setAll('y', 6, false, false, 1);
 
             //  Pacman should collide with everything except the safe tile
             this.map.setCollisionByExclusion([this.safetile], true, this.layer);
@@ -105,6 +119,11 @@
 
             this.pacman.play('munch');
             this.move(Phaser.LEFT);
+          
+            scoreText = game.add.text(0,0,'Rings: 0', {font: '15px 	Comic Sans MS',  fill: '#FEF300'});
+            bonusText = game.add.text(200,0,'Bonus: +0 ', {font: '15px 	Comic Sans MS',  fill: '#FFFFFF'});
+            lifeText = game.add.text(300,0,'Life: 2', {font: '15px 	Comic Sans MS',  fill: '#FF0000'});  
+
 
         },
 
@@ -225,6 +244,9 @@
         eatDot: function (pacman, dot) {
 
             dot.kill();
+           
+            score += 1;
+            scoreText.text = 'Rings : ' + score;
             
             var audio = new Audio('assets/Ring Sound.mp3');          
             audio.play()
@@ -232,14 +254,30 @@
             if (this.dots.total === 0)
             {
                 this.dots.callAll('revive');
+                this.dots2.callAll('revive');
             }
 
         },
+       
+        eatDot2: function (pacman, dot2) {
+
+            dot2.kill();
+            score += 2;   
+            scoreText.text = 'Rings : ' + score;
+            bonus += 10;
+            bonusText.text = 'Bonus: +' + bonus;
+            
+            var audio = new Audio('assets/Bonus Sound.mp3');
+            audio.play()
+           
+        },
+
 
         update: function () {
           
             this.physics.arcade.collide(this.pacman, this.layer);
             this.physics.arcade.overlap(this.pacman, this.dots, this.eatDot, null, this);
+            this.physics.arcade.overlap(this.pacman, this.dots2, this.eatDot2, null, this);
 
             this.marker.x = this.math.snapToFloor(Math.floor(this.pacman.x), this.gridsize) / this.gridsize;
             this.marker.y = this.math.snapToFloor(Math.floor(this.pacman.y), this.gridsize) / this.gridsize;
