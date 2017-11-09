@@ -77,6 +77,7 @@
 
             this.load.image('dot', 'assets/ring.png');
             this.load.image('dot2', 'assets/ringBonus.png');
+            this.load.image('dot3', 'assets/bonus2.png');
             this.load.image('tiles', 'assets/pacman-tiles.png');
             this.load.spritesheet('pacman', 'assets/sonic.png', 32, 32);
             this.load.tilemap('map', 'assets/pacman-map.json', null, Phaser.Tilemap.TILED_JSON);
@@ -94,15 +95,21 @@
 
             this.dots = this.add.physicsGroup();
             this.dots2 = this.add.physicsGroup();
+            this.dots3 = this.add.physicsGroup();
+
 
             this.map.createFromTiles(7, this.safetile, 'dot', this.layer, this.dots);
             this.map.createFromTiles(7, this.safetile, 'dot2', this.layer, this.dots2);
+            this.map.createFromTiles(7, this.safetile, 'dot3', this.layer, this.dots3);
 
             //  The dots will need to be offset by 6px to put them back in the middle of the grid
             this.dots.setAll('x', 6, false, false, 1);
             this.dots.setAll('y', 6, false, false, 1);
             this.dots2.setAll('x', 6, false, false, 1);
             this.dots2.setAll('y', 6, false, false, 1);
+            this.dots3.setAll('x', 6, false, false, 1);
+            this.dots3.setAll('y', 6, false, false, 1);
+
 
             //  Pacman should collide with everything except the safe tile
             this.map.setCollisionByExclusion([this.safetile], true, this.layer);
@@ -256,6 +263,18 @@
                 this.dots.callAll('revive');
                 this.dots2.callAll('revive');
             }
+            if (score === 150)
+            {
+                
+            	this.dots2.callAll('revive');
+            }
+         
+           if (score % 250 === 0)
+            {
+                
+            	this.dots3.callAll('revive');
+            }
+
 
         },
        
@@ -271,6 +290,19 @@
             audio.play()
            
         },
+       
+        eatDot3: function (pacman, dot3) {
+           
+            dot3.kill();
+            score += 5;   
+            scoreText.text = 'Rings : ' + score;
+            bonus += 5;
+            bonusText.text = 'Bonus: +' + bonus;
+            
+           
+        },
+        
+
 
 
         update: function () {
